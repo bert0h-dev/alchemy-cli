@@ -1,0 +1,30 @@
+name: Release Alchemy CLI
+
+on:
+  push:
+    tags:
+      - 'v*' # Ej: v1.0.0
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clonar repo
+        uses: actions/checkout@v3
+
+      - name: Configurar Git
+        run: |
+          git config --global user.email "github-actions@example.com"
+          git config --global user.name "GitHub Actions"
+
+      - name: Empaquetar binario
+        run: |
+          chmod +x bin/alchemy
+          mkdir -p dist
+          cp bin/alchemy dist/
+          cd dist && tar czf alchemy-cli.tar.gz alchemy
+
+      - name: Crear release en GitHub
+        uses: softprops/action-gh-release@v1
+        with:
+          files: dist/alchemy-cli.tar.gz

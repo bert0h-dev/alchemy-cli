@@ -22,9 +22,18 @@ jobs:
           chmod +x bin/alchemy
           ./bin/alchemy help
           ./bin/alchemy version
+        
+      - name: Validar artefacto antes de la carga
+        run: |
+          if [ -f ./bin/alchemy ]; then
+            echo "Artefacto encontrado. Procediendo con la carga."
+          else
+            echo "Error: Artefacto no encontrado."
+            exit 1
+          fi
 
       - name: Publicar artefacto (opcional)
         uses: actions/upload-artifact@v3
         with:
           name: alchemy-cli
-          path: .
+          path: ./bin/alchemy

@@ -30,6 +30,14 @@ export ALCHEMY_HOME="$HOME/.alchemy"
 source "$ALCHEMY_HOME/init.sh"
 ```
 
+## Instalación
+
+Ejecuta este comando en tu terminal:
+
+```bash
+curl -fsSL https://alchemy.sh/install  | sh
+```
+
 ## 🧙‍♂️ Bonus: función `transmute` (ejemplo simbólico)
 
 ```bash
