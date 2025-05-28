@@ -1,0 +1,12 @@
+#!/bin/bash
+
+BINARY="$HOME/.alchemy/bin/alchemy"
+LINK="/usr/local/bin/alchemy"
+
+if [ -L "$LINK" ] && [ -f "$BINARY" ]; then
+  echo -e "\033[1;32m✔ Alchemy ya está instalado globalmente.\033[0m"
+else
+  echo -e "\033[1;33m⚠ Alchemy no está instalado globalmente. Instalando...\033[0m"
+  sudo ln -sf "$BINARY" "$LINK"
+  echo -e "\033[1;32m✔ Symlink creado: $LINK → $BINARY\033[0m"
+fi

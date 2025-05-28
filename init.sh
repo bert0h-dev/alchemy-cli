@@ -2,6 +2,7 @@
 # ~/.alchemy/init.sh
 
 # chmod +x init.sh module/*.sh plugins/*.sh scripts/*.sh config/*.json bin/alchemy config/themes/*.json
+# sudo ln -sf "$HOME/.alchemy/bin/alchemy" "/usr/local/bin/alchemy"
 
 set -e
 
@@ -29,6 +30,12 @@ if ! grep -q 'ALCHEMY_HOME' ~/.bashrc && ! grep -q 'ALCHEMY_HOME' ~/.zshrc; then
   echo 'export ALCHEMY_HOME="$HOME/.alchemy"' >> ~/.bashrc
   echo 'export PATH="$ALCHEMY_HOME:$PATH"' >> ~/.bashrc
   source ~/.bashrc
+fi
+
+# Crear symlink global
+if ! command -v alchemy >/dev/null; then
+  echo -e "\033[1;35m🔗 Creando symlink global...\033[0m"
+  sudo ln -sf "$ALCHEMY_HOME/bin/alchemy" "/usr/local/bin/alchemy"
 fi
 
 echo -e "\033[1;32m✔ Alchemy instalado. Usa 'alchemy' para comenzar.\033[0m"

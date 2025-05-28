@@ -9,6 +9,9 @@ source "$ALCHEMY_HOME/modules/core.sh"
 source "$ALCHEMY_HOME/modules/ui.sh"
 source "$ALCHEMY_HOME/modules/plugins.sh"
 source "$ALCHEMY_HOME/modules/config.sh"
+source "$ALCHEMY_HOME/modules/update_notifier.sh"
+
+check_for_update
 
 log_command "$@"
 
@@ -85,14 +88,28 @@ case "$1" in
     gum spin --title "Verificando actualizaciones..." -- sleep 1
 
     TMP_DIR=$(mktemp -d)
-    REPO_URL="https://github.com/tuusuario/alchemy-cli/archive/refs/heads/main.tar.gz "
+    REPO_URL="https://github.com/bert0h-dev/alchemy-cli/archive/refs/heads/main.tar.gz"
 
     gum spin --title "Descargando última versión..." -- curl -fsSL "$REPO_URL" | tar xz -C "$TMP_DIR"
 
     gum spin --title "Actualizando archivos..." -- sleep 1
     cp -rf "$TMP_DIR/alchemy-cli-main/"* "$ALCHEMY_HOME/"
 
-    gum style --foreground 46 "✔ Alchemy actualizado."
+    # Actualizar número de versión local
+    REMOTE_VERSION=$(curl -fsSL "https://github.com/bert0h-dev/alchemy-cli/raw/main/LATEST_VERSION")
+    jq ".version = \"$REMOTE_VERSION\"" "$ALCHEMY_HOME/config/version.json" > /tmp/tmp.json && mv /tmp/tmp.json "$ALCHEMY_HOME/config/version.json"
+
+    gum style \
+      --border normal \
+      --margin "1" \
+      --padding "1" \
+      --align center \
+      --width 40 \
+      --foreground 46 \
+      "✔ Alchemy actualizado" \
+      "Versión: v$REMOTE_VERSION" \
+      "" \
+      "¡Listo para seguir usando!"
     ;;
   help)
     log_title "📘 Ayuda del CLI"
