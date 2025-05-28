@@ -40,3 +40,6 @@ function transmute() {
   sleep 1
   echo -e "${GREEN}✔ Listo. Oro listo para usar.${NC}"
 }
+```
+
+## Creado por Bert0h
