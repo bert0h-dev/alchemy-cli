@@ -1,0 +1,143 @@
+#!/usr/bin/env bash
+
+# ~/.alchemy/bin/alchemy - El arte de lo mágico en tu terminal
+
+export ALCHEMY_HOME="${ALCHEMY_HOME:=$HOME/.alchemy}"
+
+source "$ALCHEMY_HOME/modules/colors.sh"
+source "$ALCHEMY_HOME/modules/core.sh"
+source "$ALCHEMY_HOME/modules/ui.sh"
+source "$ALCHEMY_HOME/modules/plugins.sh"
+source "$ALCHEMY_HOME/modules/config.sh"
+
+log_command "$@"
+
+case "$1" in
+  "")
+    log_title "┌──────────────────────────────┐"
+    log_title "│        🔮 ALCHEMY CLI        │"
+    log_title "│     El arte de lo mágico     │"
+    log_title "└──────────────────────────────┘"
+    ;;
+  theme)
+    case "$2" in
+      list)
+        echo -e "${INFO}Temas disponibles:${RESET}"
+        for file in "$ALCHEMY_HOME"/config/themes/*.json; do
+          filename=$(basename "$file" .json)
+          echo -e " • $filename"
+        done
+        ;;
+      menu)
+        show_theme_menu
+        ;;
+      *)
+        load_theme "$2"
+        ;;
+    esac
+    ;;
+  plugin)
+    case "$2" in
+      list)
+        list_plugins
+        ;;
+      install)
+        install_plugin "$3"
+        ;;
+      remove|rm)
+        uninstall_plugin "$3"
+        ;;
+      menu)
+        show_plugin_menu
+        ;;
+      help)
+        show_plugin_help "$@"
+        ;;
+      *)
+        gum style --foreground 3 "Uso: alchemy plugin [list|install|remove|menu|help]"
+        ;;
+    esac
+    ;;
+  history)
+    run_history_plugin
+    ;;
+  clear-history)
+    clear_history
+    ;;
+  config)
+    case "$2" in
+      get)
+        get_config_value "$3"
+        ;;
+      set)
+        set_config_value "$3" "$4"
+        load_theme "$(get_config_value "theme")"
+        ;;
+      reset)
+        reset_config
+        ;;
+      *)
+        gum style --foreground 3 "Uso: alchemy config [get|set|reset]"
+        ;;
+    esac
+    ;;
+  update)
+    gum spin --title "Verificando actualizaciones..." -- sleep 1
+
+    TMP_DIR=$(mktemp -d)
+    REPO_URL="https://github.com/tuusuario/alchemy-cli/archive/refs/heads/main.tar.gz "
+
+    gum spin --title "Descargando última versión..." -- curl -fsSL "$REPO_URL" | tar xz -C "$TMP_DIR"
+
+    gum spin --title "Actualizando archivos..." -- sleep 1
+    cp -rf "$TMP_DIR/alchemy-cli-main/"* "$ALCHEMY_HOME/"
+
+    gum style --foreground 46 "✔ Alchemy actualizado."
+    ;;
+  help)
+    log_title "📘 Ayuda del CLI"
+    echo -e "${INFO}• alchemy${RESET}               ➤ Mostrar banner"
+    echo -e "${INFO}• alchemy theme list${RESET}    ➤ Listar temas"
+    echo -e "${INFO}• alchemy theme menu${RESET}    ➤ Seleccionar tema interactivo"
+    echo -e "${INFO}• alchemy theme <nombre>${RESET} ➤ Cambiar tema"
+    echo -e "${INFO}• alchemy plugin list${RESET}   ➤ Listar plugins"
+    echo -e "${INFO}• alchemy plugin menu${RESET}   ➤ Menú de plugins"
+    echo -e "${INFO}• alchemy plugin install <nombre>${RESET} ➤ Instalar plugin"
+    echo -e "${INFO}• alchemy plugin help <nombre>${RESET} ➤ Ayuda de plugin"
+    echo -e "${INFO}• alchemy config get/set/reset ➤ Configuración"
+    echo -e "${INFO}• alchemy update${RESET}        ➤ Simular actualización"
+    echo -e "${INFO}• alchemy init${RESET}          ➤ Inicializar estructura"
+    echo -e "${INFO}• alchemy export-config${RESET} ➤ Exportar configuración"
+    echo -e "${INFO}• alchemy import-config <ruta>${RESET} ➤ Importar configuración"
+    ;;
+  init)
+    gum style --border normal --margin "1" --padding "1" "🔧 Inicializando Alchemy..."
+
+    mkdir -p "$ALCHEMY_HOME"/{config,plugins,modules,themes}
+    cp "$ALCHEMY_HOME/themes/default.json" "$ALCHEMY_HOME/config/settings.json"
+    gum style --foreground 46 "✔ Carpeta base creada."
+
+    echo "¿Deseas instalar plugins básicos?" | gum choose --item-separator " " yes no
+    if [ $? -eq 0 ]; then
+      install_plugin example
+      install_plugin history
+    fi
+
+    gum style --foreground 46 "✔ Alchemy inicializado."
+    ;;
+  export-config)
+    export_config
+    ;;
+  import-config)
+    import_config "$2"
+    ;;
+  version|v)
+    VERSION=$(jq -r '.version' "$ALCHEMY_HOME/config/version.json")
+    DATE=$(jq -r '.build_date' "$ALCHEMY_HOME/config/version.json")
+    gum style --border normal --margin "1" --padding "1" "🔮 Alchemy CLI v$VERSION"
+    echo -e "${INFO}Build date:${RESET} $DATE"
+    ;;
+  *)
+    log_error "Comando desconocido: $1"
+    ;;
+esac

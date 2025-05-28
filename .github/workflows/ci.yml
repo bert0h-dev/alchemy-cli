@@ -1,0 +1,30 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clonar repo
+        uses: actions/checkout@v3
+
+      - name: Verificar estructura
+        run: |
+          echo "Verificando archivos..."
+          ls -la
+
+      - name: Probar comandos básicos
+        run: |
+          chmod +x bin/alchemy
+          ./bin/alchemy help
+          ./bin/alchemy version
+
+      - name: Publicar artefacto (opcional)
+        uses: actions/upload-artifact@v3
+        with:
+          name: alchemy-cli
+          path: .

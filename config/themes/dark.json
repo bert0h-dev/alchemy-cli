@@ -1,0 +1,15 @@
+{
+  "theme": "dark",
+  "colors": {
+    "primary": "\u001b[38;5;45m",
+    "secondary": "\u001b[38;5;93m",
+    "success": "\u001b[38;5;40m",
+    "error": "\u001b[38;5;196m",
+    "info": "\u001b[38;5;81m",
+    "reset": "\u001b[0m"
+  },
+  "style": {
+    "bold": "\u001b[1m",
+    "underline": "\u001b[4m"
+  }
+}
